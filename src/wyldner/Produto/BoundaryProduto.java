@@ -99,7 +99,7 @@ public class BoundaryProduto implements IPrincipal {
 		
 		colAcoes.setCellFactory(callBack);
 		
-		double sexto = 600.0 / 6.0;
+		double sexto = 1000.0 / 6.0;
 		colCodProd.setPrefWidth(sexto);
 		colNomeProd.setPrefWidth(sexto);
 		colDescProd.setPrefWidth(sexto);

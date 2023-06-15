@@ -1,129 +1,98 @@
 package wyldner.Vendas;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import wyldner.Principal.VendProd;
 import wyldner.Produto.Produto;
 
 public class CtrlVendas {
-	private LongProperty idVendas = new SimpleLongProperty(0);
-	private IntegerProperty qntidade = new SimpleIntegerProperty(0);
-	private DoubleProperty total = new SimpleDoubleProperty(0.0);
-	private ObjectProperty<LocalDate> dtVenda = new SimpleObjectProperty<>(LocalDate.now());
-	private ObjectProperty<LocalTime> hVenda = new SimpleObjectProperty<>(LocalTime.now());
-	private ObservableList<Produto> produtos = FXCollections.observableArrayList();
+	private LongProperty idVend = new SimpleLongProperty(0);
+	private DoubleProperty qnt = new SimpleDoubleProperty(0.0);
 	
-	private static int qntProd = 0;
-
+	
+	private ObservableList<VendProd> listaVendProd = FXCollections.observableArrayList();
 	private IVendasDAO vDao;
-	private ObservableList<Vendas> lista = FXCollections.observableArrayList();
-
+	
+	private static double total = 0;
+	private static int qnt = 0;
 //===================================================================================================================================
-	public void fromEntity(Vendas v) { 
-		idVendas.set(v.getIdVendas());
-		qntidade.set(v.getQntidade());
-	}
-	
-//===================================================================================================================================	
-	public void limpar() { 
-		idVendas.set(0);
-		qntidade.set(0);
-	}
-
-	//---------------------------------------------------------------------------------
-	public void adicionar() throws SQLException, ClassNotFoundException{ 
-		Vendas v = new Vendas();		
-		v.setIdVendas(idVendas.get());
-		v.setQntidade(qntidade.get());
-		
+	public CtrlVendas() throws ClassNotFoundException, SQLException {
 		vDao = new VendasDAO();
-		vDao.adicionar(v);
 	}
-
-	//---------------------------------------------------------------------------------
-	public void atualizar() throws SQLException, ClassNotFoundException { 
-		Vendas v = new Vendas();		
-		v.setIdVendas(idVendas.get());
-		v.setQntidade(qntidade.get());
-		
-		vDao = new VendasDAO();
-		vDao.adicionar(v);
-	}
-	
-	
 	
 	//---------------------------------------------------------------------------------
-	public void pesquisarId() throws SQLException, ClassNotFoundException { 
-		Vendas v = new Vendas();		
-		v.setIdVendas(idVendas.get());
-		v.setQntidade(qntidade.get());
-		
-		vDao = new VendasDAO();
-		v = vDao.procurarPorId(idVendas.get());
-		System.out.println(v);
+	
+	public void limpar() {
+		System.out.println("limpando");
+		idVend.set(0);
+		qnt.set(0);
 	}
 	
 	//---------------------------------------------------------------------------------
 
-	public void excluir(long id) throws SQLException, ClassNotFoundException { 
-		Vendas v = new Vendas();
-		v.setIdVendas(id);
+	
+	public void excluir(VendProd vp) throws SQLException { 
+		listaVendProd.remove(vp);
+		vDao.remover(vp.getIdVendas());
+	}
+	
+	public void fromEntity(VendProd vp) { 
+		idVend.set(vp.getIdVendas());
+		qnt.set(vp.getTotal());
 		
-		vDao = new VendasDAO();
-		vDao.procurarPorId(id);
 	}
 	
-	
-	//---------------------------------------------------------------------------------
-	public void adicionarProd(Produto p) { 
-		produtos.add(p);
-		qntProd ++;
+	public void atualizar() throws SQLException { 
+			Vendas v = new Vendas();
+			v.setIdVendas(vDao.ProcurarTodos());
+			v.setTotal(total++);
+			v.setQntidade(qnt++);
+			
+			System.out.println(v);
+			
+			Produto p = new Produto();
+			p.setCodProduto(codProd.get());
+			p.setNome(nomeProd.get());
+			p.setDescricao(desc.get());
+			p.setPrecoUnit(precoUnit.get());
+			
+			System.out.println(p);	
+			
+			VendProd vp = new VendProd(v, p);
+			
+//			for (int i = 0; i < listaVendProd.size(); i++) { 
+//				VendProd prod = listaVendProd.get(i);
+//				if (prod.getIdVendas() == idVend.get()) { 
+//					listaVendProd.set(i, vp);
+//				}
+//			}
+			vDao.adicionar(vp);
+//			pesquisar();
 	}
-
+	
+	public void pesquisar() throws SQLException { 
+		listaVendProd.clear();
+		List<VendProd> lst = vDao.procurarPorTitulo(idVend.get());
+		listaVendProd.addAll(lst);		
+	}
+	
 //===================================================================================================================================
-	public final LongProperty getIdVendas() {
-		return  idVendas;
+	public final ObservableList<VendProd> getListaProd() {
+		return listaVendProd;
 	}
-	
-	public final IntegerProperty getQntidade() {
-		return qntidade;
+	public final LongProperty getIdVend() {
+		return idVend;
 	}
-
-	public final DoubleProperty getTotal() {
-		return total;
+	public final DoubleProperty getTot() {
+		return qnt;
 	}
-
-	public final ObjectProperty<LocalDate> getDtVenda() {
-		return dtVenda;
-	}
-
-	public final ObjectProperty<LocalTime> gethVenda() {
-		return hVenda;
-	}
-
-	public ObservableList<Vendas> getLista() { 
-		return lista;
-	}
-
-	public final long getCodProd() {
-		Produto p = new Produto();
-		p = produtos.get(qntProd);
-		return p.getCodProduto();
-	}
-
-	public static final int getQntProd() {
-		return qntProd;
-	}
-	
 }

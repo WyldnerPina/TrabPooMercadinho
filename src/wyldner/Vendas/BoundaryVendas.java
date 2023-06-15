@@ -2,7 +2,6 @@ package wyldner.Vendas;
 
 import java.sql.SQLException;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,9 +18,9 @@ import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.LongStringConverter;
 import wyldner.Principal.IPrincipal;
+import wyldner.Principal.VendProd;
 import wyldner.Produto.CtrlProduto;
 import wyldner.Produto.Produto;
 
@@ -51,49 +50,106 @@ public class BoundaryVendas implements IPrincipal {
 		Bindings.bindBidirectional(txtNomeProd.textProperty(), ctrlProd.getNome());
 		Bindings.bindBidirectional(txtDescProd.textProperty(), ctrlProd.getDesc());
 		Bindings.bindBidirectional(txtPrecoUnid.textProperty(), ctrlProd.getPreco(),(StringConverter) new DoubleStringConverter());
-		Bindings.bindBidirectional(txtQntProd.textProperty(), ctrlProd.getQntProd(),(StringConverter) new IntegerStringConverter());
 	}
 
 
 /*===================================================================================================================================
   															TABELA DE PRODUTO
 ===================================================================================================================================*/
-	 
-		
-		
+	public void tableViewProd() {
+			TableColumn<Produto, Long> colCodProd = new TableColumn<>("Código");
+			colCodProd.setCellValueFactory(new PropertyValueFactory<Produto, Long>("codProduto"));
+			
+			TableColumn<Produto, String> colNomeProd = new TableColumn<>("Produto");
+			colNomeProd.setCellValueFactory(new PropertyValueFactory<Produto, String>("nome"));
+			
+			TableColumn<Produto, String> colDescProd = new TableColumn<>("Descrição");
+			colDescProd.setCellValueFactory(new PropertyValueFactory<Produto, String>("descricao"));
+			
+			TableColumn<Produto, Double> colPrecoUnit = new TableColumn<>("Preço unidade");
+			colPrecoUnit.setCellValueFactory(new PropertyValueFactory<Produto, Double>("precoUnit"));
 	
 		
-	public void tableViewProd() {
-		
-		TableColumn<Produto, Long> colCodProd = new TableColumn<>("Código");
-		colCodProd.setCellValueFactory(new PropertyValueFactory<Produto, Long>("codProduto"));
-		
-		TableColumn<Produto, String> colNomeProd = new TableColumn<>("Produto");
-		colNomeProd.setCellValueFactory(new PropertyValueFactory<Produto, String>("nome"));
-		
-		TableColumn<Produto, String> colDescProd = new TableColumn<>("Descrição");
-		colDescProd.setCellValueFactory(new PropertyValueFactory<Produto, String>("descricao"));
-		
-		TableColumn<Produto, Double> colPrecoUnit = new TableColumn<>("Preço unidade");
-		colPrecoUnit.setCellValueFactory(new PropertyValueFactory<Produto, Double>("precoUnit"));
-		
-		TableColumn<Produto, Integer> colQntProd = new TableColumn<>("Quantidade");
-		colQntProd.setCellValueFactory(new PropertyValueFactory<Produto, Integer>("qntProd"));
-		
 		//------------------------------------------------------------------------------------------------------
+			
+			double quarto = 1000.0 / 4.0;
+			colCodProd.setPrefWidth(quarto);
+			colNomeProd.setPrefWidth(quarto);
+			colDescProd.setPrefWidth(quarto);
+			colPrecoUnit.setPrefWidth(quarto);
 		
-		TableColumn<Produto, Void> colAcoes = new TableColumn<>("Ações");
-		Callback<TableColumn<Produto, Void>, TableCell<Produto, Void>> callBack = new Callback<>() {
+		
+			tableProd.getColumns().addAll(colCodProd, colNomeProd, colDescProd, colPrecoUnit);
+			tableProd.setItems(ctrlProd.getListaProd());
+
+			tableProd.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Produto>() {
+			@Override
+			public void onChanged(Change<? extends Produto> p) {
+				if (!p.getList().isEmpty()) {
+					ctrlProd.fromEntity(p.getList().get(0));
+				}
+			}
+		});
+	}
+/*=================================================================================================================================== 
+ 															TABELA DE VENDA
+===================================================================================================================================*/
+	
+	private TextField txtIdVend = new TextField();
+	private TextField txtTot = new TextField();
+	
+	private TableView<VendProd> tableVenda = new TableView<>();
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	public void ligacoesVend() { 
+		Bindings.bindBidirectional(txtIdVend.textProperty(), ctrlVendas.getIdVend(),(StringConverter) new LongStringConverter());
+		Bindings.bindBidirectional(txtTotal.textProperty(), ctrlVendas.getTot(), (StringConverter) new DoubleStringConverter());
+		
+		Bindings.bindBidirectional(txtCodProd.textProperty(), ctrlVendas.getCodProd(),(StringConverter) new LongStringConverter());
+		Bindings.bindBidirectional(txtNomeProd.textProperty(), ctrlVendas.getNomeProd());
+		Bindings.bindBidirectional(txtDescProd.textProperty(), ctrlVendas.getDesc());
+		Bindings.bindBidirectional(txtPrecoUnid.textProperty(), ctrlVendas.getPrecoUnit(),(StringConverter) new DoubleStringConverter());
+	}
+	
+	public void vendaTableView() { 
+		TableColumn<VendProd, Long> colIdVend = new TableColumn<>("Venda");
+		colIdVend.setCellValueFactory(new PropertyValueFactory<VendProd, Long>("idVendas"));
+		
+		TableColumn<VendProd, String> colTot = new TableColumn<>("Total");
+		colTot.setCellValueFactory(new PropertyValueFactory<VendProd, String>("total"));
+		
+		TableColumn<VendProd, Long> colCodProd = new TableColumn<>("Código");
+		colCodProd.setCellValueFactory(new PropertyValueFactory<VendProd, Long>("codProduto"));
+		
+		TableColumn<VendProd, String> colNomeProd = new TableColumn<>("Produto");
+		colNomeProd.setCellValueFactory(new PropertyValueFactory<VendProd, String>("nomeProd"));
+		
+		TableColumn<VendProd, String> colDescProd = new TableColumn<>("Descrição");
+		colDescProd.setCellValueFactory(new PropertyValueFactory<VendProd, String>("descricao"));
+
+		TableColumn<VendProd, Double> colPrecoUnit = new TableColumn<>("Preço unidade");
+		colPrecoUnit.setCellValueFactory(new PropertyValueFactory<VendProd, Double>("precoUnit"));
+		
+		
+		
+		TableColumn<VendProd, Void> colAcoes = new TableColumn<>("Ações");
+		Callback<TableColumn<VendProd, Void>, TableCell<VendProd, Void>> callBack = new Callback<>() {
 
 			@Override
-			public TableCell<Produto, Void> call(TableColumn<Produto, Void> col) {
-				TableCell<Produto, Void> tCell = new TableCell<>() {
+			public TableCell<VendProd, Void> call(TableColumn<VendProd, Void> col) {
+				TableCell<VendProd, Void> tCell = new TableCell<>() {
 
-					final Button btnExcluir = new Button("Adicionar");
+					final Button btnExcluir = new Button("Excluir");
 					{
 						btnExcluir.setOnAction(e -> {
-							Produto p = tableProd.getItems().get(getIndex());
-							ctrlVendas.adicionarProd(p);
+							VendProd v = tableVenda.getItems().get(getIndex());
+							try {
+								ctrlVendas.excluir(v);
+							} catch (SQLException e1) {
+								Alert a = new Alert(AlertType.ERROR,"Erro ao excluir o registro, contate o Administrador", ButtonType.OK);
+								a.showAndWait();
+							}
 						});
 					}
 
@@ -114,120 +170,26 @@ public class BoundaryVendas implements IPrincipal {
 		
 		colAcoes.setCellFactory(callBack);
 		
-		double sexto = 600.0 / 6.0;
+		double sexto = 1000.0 / 6.0;
 		colCodProd.setPrefWidth(sexto);
 		colNomeProd.setPrefWidth(sexto);
-		colDescProd.setPrefWidth(sexto);
-		colPrecoUnit.setPrefWidth(sexto);
-		colQntProd.setPrefWidth(sexto);
 		colAcoes.setPrefWidth(sexto);
 		
 		
-		tableProd.getColumns().addAll(colCodProd, colNomeProd, colDescProd, colPrecoUnit, colQntProd, colAcoes);
-		tableProd.setItems(ctrlProd.getListaProd());
+		tableVenda.getColumns().addAll(colIdVend, colTot, colCodProd, colNomeProd, colDescProd, colPrecoUnit, colAcoes);
+		tableVenda.setItems(ctrlVendas.getListaProd());
 
-		tableProd.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Produto>() {
+		tableVenda.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<VendProd>() {
 			@Override
-			public void onChanged(Change<? extends Produto> p) {
-				if (!p.getList().isEmpty()) {
-					ctrlProd.fromEntity(p.getList().get(0));
+			public void onChanged(Change<? extends VendProd> vp) {
+				if (!vp.getList().isEmpty()) {
+					ctrlVendas.fromEntity(vp.getList().get(0));
 				}
 			}
 		});
 	}
-/*=================================================================================================================================== 
- 															TABELA DE VENDA
-===================================================================================================================================*/
-	
-	private TableView<Vendas> tableVenda = new TableView<>();
-	
-//===================================================================================================================================
-	@SuppressWarnings({ "rawtypes" })
-	public void ligacoesVendas() { 
-		Bindings.bindBidirectional(txtCodProd.textProperty(), ctrlVendas.getIdVendas(),(StringConverter) new LongStringConverter());
-		Bindings.bindBidirectional(txtQntProd.textProperty(), ctrlVendas.getQntidade(),(StringConverter) new IntegerStringConverter());
-		Bindings.bindBidirectional(txtPrecoUnid.textProperty(), ctrlVendas.getTotal(),(StringConverter) new DoubleStringConverter());
-//		Bindings.bindBidirectional(tableProd.accessibleTextProperty(), ctrlVendas.getCodProd(),(StringConverter) new DoubleStringConverter());
-	}
 	
 	
-	@SuppressWarnings("unchecked")
-	public void vendaTableView() {
-		TableColumn<Vendas, Integer> colQntdd = new TableColumn<>("Qtdade");
-		colQntdd.setCellValueFactory(new PropertyValueFactory<Vendas, Integer>("qntidade"));
-		
-		TableColumn<Vendas, Double> colTotal = new TableColumn<>("Total");
-		colTotal.setCellValueFactory(new PropertyValueFactory<Vendas, Double>("Total"));
-		
-		// ---------------------------------------------------------------------------------
-		
-		TableColumn<Vendas, String> colNomeProd = new TableColumn<>("Produto");
-//		colNomeProd.setText("nossa");
-		colNomeProd.setCellValueFactory(ctrlVendas.getCodProd());
-		
-
-		TableColumn<Vendas, Double> colPrecoUnit = new TableColumn<>("Preço unidade");
-		colPrecoUnit.setCellValueFactory(new PropertyValueFactory<Vendas, Double>("precoUnit"));
-		
-		
-
-		// ---------------------------------------------------------------------------------
-		TableColumn<Vendas, Void> colAcoes = new TableColumn<>("Ações");
-		Callback<TableColumn<Vendas, Void>, TableCell<Vendas, Void>> callBack = new Callback<>() {
-
-			@Override
-			public TableCell<Vendas, Void> call(TableColumn<Vendas, Void> col) {
-				TableCell<Vendas, Void> tCell = new TableCell<>() {
-
-					final Button btnExcluir = new Button("Excluir");
-					{
-						btnExcluir.setOnAction(e -> {
-								Vendas v = tableVenda.getItems().get(getIndex());
-
-								try {
-									ctrlVendas.excluir(v.getIdVendas());
-								} catch (ClassNotFoundException | SQLException e1) {
-									e1.printStackTrace();
-								}
-						});
-					}
-
-					@Override
-					public void updateItem(Void item, boolean empty) {
-						super.updateItem(item, empty);
-						if (empty) {
-							setGraphic(null);
-						} else {
-							setGraphic(btnExcluir);
-						}
-					}
-				};
-				return tCell;
-			}
-		};
-
-		colAcoes.setCellFactory(callBack);
-		
-		double quarto = 600.0 / 4.0;
-		colQntdd.setPrefWidth(quarto);
-		colNomeProd.setPrefWidth(quarto);
-		colPrecoUnit.setPrefWidth(quarto);
-		colTotal.setPrefWidth(quarto);
-		colAcoes.setPrefWidth(quarto);
-
-		// ---------------------------------------------------------------------------------
-		tableVenda.getColumns().addAll(colQntdd, colTotal, colNomeProd, colPrecoUnit, colAcoes);
-		tableVenda.setItems(ctrlVendas.getLista());
-
-		tableVenda.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Vendas>() {
-			@Override
-			public void onChanged(Change<? extends Vendas> c) {
-				if (!c.getList().isEmpty()) {
-					ctrlVendas.fromEntity(c.getList().get(0));// arrumar no vendas=================
-				}
-			}
-		});
-	}
 	
 	// VALORES FINAIS
 	private TextField txtPago = new TextField();
@@ -252,6 +214,9 @@ public class BoundaryVendas implements IPrincipal {
 //==================================================== PRODUTO ====================================================
 		ligacoesProd();
 		tableViewProd();
+		
+		vendaTableView();
+		ligacoesVend();
 
 		// ---------------------------------------------------------------------------------
 
@@ -319,6 +284,15 @@ public class BoundaryVendas implements IPrincipal {
 		Button btnLimpar = new Button("Limpar");
 		btnLimpar.setOnAction(e -> ctrlVendas.limpar());
 
+		Button btnInserir = new Button("Inserir");
+		btnInserir.setOnAction(e -> {
+			try {
+				ctrlVendas.adicionar();
+			} catch (SQLException e1) {
+				Alert a = new Alert(AlertType.ERROR, "Erro ao gravar, contate o Administrador", ButtonType.OK);
+				a.showAndWait();
+			}
+		});
 		
 		Button btnPesquisar = new Button("Pesquisar");
 		btnPesquisar.setOnAction(e -> {
@@ -331,6 +305,10 @@ public class BoundaryVendas implements IPrincipal {
 			}
 		});
 
+		AnchorPane.setTopAnchor(btnInserir, 120.0);
+		AnchorPane.setRightAnchor(btnInserir, 260.0);
+		btnInserir.setPrefWidth(100.0);
+		
 		AnchorPane.setTopAnchor(btnPesquisar, 120.0);
 		AnchorPane.setRightAnchor(btnPesquisar, 140.0);
 		btnPesquisar.setPrefWidth(100.0);
@@ -348,13 +326,77 @@ public class BoundaryVendas implements IPrincipal {
 		
 		
 //==================================================== VENDA ====================================================		
-		vendaTableView();
 		
-		AnchorPane.setTopAnchor(tableVenda, 300.0);
+		Label lblTot = new Label("Total:");
+		lblTot.setCenterShape(true);
+		lblTot.setStyle("-fx-text-fill: '#c1c5d3'; -fx-font-size: 12px; -fx-font-family: Arial;");
+
+		Label lblIdVenda = new Label("Venda:");
+		lblIdVenda.setStyle("-fx-text-fill: '#c1c5d3'; -fx-font-size: 12px; -fx-font-family: Arial;");
+
+
+		// ---------------------------------------------------------------------------------
+		AnchorPane.setTopAnchor(lblTot, 300.0);
+		AnchorPane.setRightAnchor(lblTot, 210.0);
+
+		AnchorPane.setTopAnchor(lblIdVenda, 300.0);
+		AnchorPane.setRightAnchor(lblIdVenda, 440.0);
+
+		// ---------------------------------------------------------------------------------
+		AnchorPane.setTopAnchor(txtIdVend, 295.0);
+		AnchorPane.setRightAnchor(txtIdVend, 250.0);
+		txtIdVend.setPrefWidth(185.0);
+		
+		AnchorPane.setTopAnchor(txtTot, 295.0);
+		AnchorPane.setRightAnchor(txtTot, 20.0);
+		txtTot.setPrefWidth(185.0);
+		
+		AnchorPane.setTopAnchor(tableVenda, 370.0);
 		AnchorPane.setLeftAnchor(tableVenda, 20.0);
 		AnchorPane.setRightAnchor(tableVenda, 20.0);
-		tableVenda.setPrefHeight(300.0);
+		tableVenda.setPrefHeight(220.0);
+	
+	
+	// ---------------------------------------------------------------------------------
+		
+		Button btnLimparVend = new Button("Limpar");
+		btnLimparVend.setOnAction(e -> ctrlVendas.limpar());
+		
+		Button btnInserirVend = new Button("Inserir");
+		btnInserirVend.setOnAction(e -> {
+			try {
+				ctrlVendas.adicionar();
+			} catch (SQLException e1) {
+				Alert a = new Alert(AlertType.ERROR, "Erro ao gravar, contate o Administrador", ButtonType.OK);
+				a.showAndWait();
+			}
+		});
+		
+		Button btnPesqVend = new Button("Pesquisar");
+		btnPesqVend.setOnAction(e -> {
+			try {
+				ctrlVendas.pesquisar();
+			} catch (SQLException e1) {
+				Alert a = new Alert(AlertType.ERROR, "Erro ao pesquisar no banco de dados, contate o Administrador",
+						ButtonType.OK);
+				a.showAndWait();
+			}
+		});
+		
+		
+		AnchorPane.setTopAnchor(btnPesqVend, 330.0);
+		AnchorPane.setRightAnchor(btnPesqVend, 260.0);
+		btnPesqVend.setPrefWidth(100.0);
+		
+		AnchorPane.setTopAnchor(btnInserirVend, 330.0);
+		AnchorPane.setRightAnchor(btnInserirVend, 140.0);
+		btnInserirVend.setPrefWidth(100.0);
+		
+		AnchorPane.setTopAnchor(btnLimparVend, 330.0);
+		AnchorPane.setRightAnchor(btnLimparVend, 20.0);
+		btnLimparVend.setPrefWidth(100.0);
 
+		
 		// ---------------------------------------------------------------------------------
 
 		Label lblPago = new Label("PAGO:");
@@ -391,9 +433,12 @@ public class BoundaryVendas implements IPrincipal {
 
 		// ---------------------------------------------------------------------------------
 		principal.getChildren().addAll(lblProduto, lblCodProd, lblPreco, lblNome, lblQntProd, lblDesc, 
-				txtCodProd, txtNomeProd, txtPrecoUnid, txtQntProd, txtDescProd, btnLimpar, btnPesquisar, 
-				tableProd, tableVenda, 
-				lblPago, lblTroco, lblTotal, txtPago, txtTroco, txtTotal);
+				txtCodProd, txtNomeProd, txtPrecoUnid, txtQntProd, txtDescProd, tableProd, 
+				lblTot, lblIdVenda, txtIdVend, txtTot, tableVenda, 
+				btnInserir, btnPesquisar, btnLimpar,
+				btnLimparVend, btnInserirVend, btnPesqVend,
+				lblPago, lblTroco, lblTotal, 
+				txtPago, txtTroco, txtTotal);
 	}
 
 //===================================================================================================================================

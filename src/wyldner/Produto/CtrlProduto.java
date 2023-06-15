@@ -40,7 +40,6 @@ public class CtrlProduto {
 	
 	//---------------------------------------------------------------------------------
 
-	
 	public void excluir(Produto p) throws SQLException { 
 		listaProd.remove(p);
 		pDao.remover(p.getCodProduto());
@@ -65,6 +64,7 @@ public class CtrlProduto {
 			
 			p = pDao.adicionar(p);
 			listaProd.add(p);
+			
 		} else { 
 			Produto p = new Produto();
 			p.setCodProduto(codProd.get());
@@ -72,6 +72,8 @@ public class CtrlProduto {
 			p.setDescricao(desc.get());
 			p.setPrecoUnit(precoUnit.get());
 			p.setQntProd(qntProd.get());
+			
+			System.out.println(p);
 			
 			for (int i = 0; i < listaProd.size(); i++) { 
 				Produto prod = listaProd.get(i);
@@ -81,6 +83,8 @@ public class CtrlProduto {
 			}
 			pDao.adicionar(p);
 		}
+		limpar();
+		pesquisar();
 	}
 	
 	public void pesquisar() throws SQLException { 
